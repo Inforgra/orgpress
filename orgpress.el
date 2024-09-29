@@ -10,8 +10,14 @@
 (defvar orgpress-mode-map
   (let ((map (make-sparse-keymap)))
     (define-key map "g" 'orgpress-status)
+    (define-key map "q" 'orgpress--quit-status)
     (define-key map (kbd "<return>") 'orgpress--open-at-point)
     map))
+
+(defun orgpress--quit-status ()
+  "상태창을 닫는다."
+  (interactive)
+  (quit-window t))
 
 (defun orgpress--open-at-point ()
   "커서가 위치한 곳의 포스트를 오픈한다."
