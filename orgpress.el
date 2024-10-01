@@ -3,13 +3,16 @@
 ;;; Commentary:
 ;;; Code:
 
+(require 'files)
 (require 'org-element)
 
 (defvar orgpress-root "~/Dropbox/Writings")
 
 (defvar orgpress-mode-map
   (let ((map (make-sparse-keymap)))
+    (define-key map "d" 'orgpress--remove-at-point)
     (define-key map "g" 'orgpress-status)
+    (define-key map "n" 'orgpress-new-post)
     (define-key map "q" 'orgpress--quit-status)
     (define-key map (kbd "<return>") 'orgpress--open-at-point)
     map))
@@ -25,6 +28,14 @@
   (let ((filename (plist-get (text-properties-at (point)) 'filename)))
     (when (not (null filename))
       (pop-to-buffer (find-file filename)))))
+
+(defun orgpress--remove-at-point ()
+  "커서가 위치한 곳의 포스트를 삭제한다."
+  (interactive)
+  (let ((filename (plist-get (text-properties-at (point)) 'filename)))
+    (when (not (null filename))
+      (if (yes-or-no-p (format "Remove %s ?" (file-name-directory filename)))
+          (orgpress-remove-dir (file-name-directory filename))))))
 
 (define-derived-mode orgpress-mode nil "Orgpress")
 
@@ -85,20 +96,45 @@
               'face 'font-lock-constant-face
               'filename (alist-get 'filename post)))
 
-;; (orgpress--draw-post (car (orgpress--get-posts)))
-
 (defun orgpress--draw-posts (posts)
   "여러개의 포스트 POSTS 들을 출력한다."
   (cl-reduce #'concat (mapcar #'orgpress--draw-post posts)))
 
 ;;;###autoload
 (defun orgpress-status ()
-  "."
+  "포스트의 목록을 출력한다."
   (interactive)
   (let ((buffer (get-buffer-create "*orgpress-status*")))
     (progn
       (orgpress--draw-status buffer)
       (pop-to-buffer buffer))))
+
+(defun orgpress-new-post ()
+  "새로운 포스트를 만든다."
+  (interactive)
+  (let* ((post-name (read-string "Post name: "))
+         (today (format-time-string "%Y-%m-%d"))
+         (post-filename (concat orgpress-root "/" today "-" post-name "/" today "-" post-name ".org")))
+    (make-directory (file-name-directory post-filename))
+    (pop-to-buffer (find-file post-filename))
+    (with-current-buffer
+        (insert
+         "#+PUBLISH: false\n"
+         "#+TITLE: \n"
+         "#+SUMMARY: \n"
+         "#+DATE: " today "00:00:00.000+09:00\n"
+         "#+IMAGE: \n"
+         "#+IMAGE_ALT: \n"))
+    ))
+
+(defun orgpress-remove-dir (dir)
+  "주어진 디렉토리 DIR 를 제거한다."
+  (let ((files (directory-files dir nil "[^\\.$|\\.\\.$]")))
+    (cl-loop for file in files do
+             (progn
+               (message file)
+               (delete-file (concat dir "/" file))))
+    (delete-directory dir)))
 
 (provide 'orgpress)
 ;;; orgpress.el ends here.
