@@ -122,9 +122,10 @@
          "#+PUBLISH: false\n"
          "#+TITLE: \n"
          "#+SUMMARY: \n"
-         "#+DATE: " today "00:00:00.000+09:00\n"
+         "#+DATE: " today " 00:00:00.000+09:00\n"
          "#+IMAGE: \n"
-         "#+IMAGE_ALT: \n"))
+         "#+IMAGE_ALT: \n"
+         "#+TAGS: \n"))
     ))
 
 (defun orgpress-remove-dir (dir)
