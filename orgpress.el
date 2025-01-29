@@ -1,5 +1,8 @@
-;;; orgpress.el --- .
-;;;
+;;; orgpress.el --- org-mode 로 작성한 문서 관리하기
+;; Copyright (C) 2023-2025 Inforgra
+;; Author: Inforga <inforgax@gmail.com>
+;; Keywords: font
+;; Version: 0.0.1
 ;;; Commentary:
 ;;; Code:
 
